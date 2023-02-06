@@ -1,0 +1,24 @@
+{% extends 'base.html'%}
+{% block content %}
+
+<h1> Condos</h1>
+
+<ul>
+{% for condo in object_list %}
+    <li>
+        <a href="{% url 'condo-info' condo.pk %}">{{condo.title}}</a>
+        {{condo.content}}
+        {{condo.body}}
+        {% if condo.image != None %}
+            <img src="{{condo.image.url}}">
+        {% endif %}
+        <small>
+            <a href="{% url 'update_condo' condo.pk %}">Edit</a>
+            <a href="{% url 'delete_condo' condo.pk %}">Delete</a>
+        </small>
+    </li>
+    <hr>
+{% endfor%}
+</ul>
+
+{% endblock %}

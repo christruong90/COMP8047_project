@@ -1,0 +1,17 @@
+{% extends 'base.html'%}
+{% block title %} {{condo.title}}{% endblock %}
+{% block content %}
+
+<h1>{{ condo.title }}</h1>
+<br>
+<small>
+    <a href="{% url 'update_condo' condo.pk %}">Edit</a>
+    <a href="{% url 'delete_condo' condo.pk %}">Delete</a>
+</small>
+<br>
+{% if condo.condo_image %}
+    <img src="{{ condo.condo_image.url}}"><br><br>
+{% endif %}
+{{condo.body}}
+
+{% endblock %}
