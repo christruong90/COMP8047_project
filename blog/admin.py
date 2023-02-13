@@ -1,6 +1,7 @@
 from django.contrib import admin
-from .models import Post, Condo
+from .models import Post, Condo, ReviewRating
 
 # Register your models here.
 # admin.site.register(Post)
 admin.site.register(Condo)
+admin.site.register(ReviewRating)

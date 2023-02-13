@@ -14,4 +14,33 @@
 {% endif %}
 {{condo.body}}
 
+<form action="" method="POST">
+    <br><br>
+    {% csrf_token %}
+    <h5>Write Your Review</h5>
+    <div>
+        <!--- Rating stars-->
+        <label>Rate Customer Service</label>
+        <br>
+        <div class="rate">
+            <input type="radio" name="customer_service" id="rating5" value="5" required /><label for="rating5" title="5"></label>
+            <input type="radio" name="customer_service" id="rating4" value="4" required /><label for="rating4" title="4"></label>
+            <input type="radio" name="customer_service" id="rating3" value="3" required /><label for="rating3" title="3"></label>
+            <input type="radio" name="customer_service" id="rating2" value="2" required /><label for="rating2" title="2"></label>
+            <input type="radio" name="customer_service" id="rating1" value="1" required /><label for="rating1" title="1"></label>
+        </div>
+        <br>
+        Review Title:
+        <input name="review_title" type="text" class="form-control">
+        <br>
+        Review:
+        <textarea name="review" rows="4" class="form-control"></textarea>
+        <br>
+        <input type="submit" value="Submit Review" class="btn btn-primary">
+        <br>
+    </div>
+</form>
+
 {% endblock %}
+
+

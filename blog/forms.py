@@ -1,5 +1,5 @@
 from django import forms
-from .models import Condo
+from .models import Condo, ReviewRating
 
 class CondoForm(forms.ModelForm):
     class Meta:
@@ -22,3 +22,8 @@ class EditForm(forms.ModelForm):
             'content': forms.Textarea(attrs={'class': 'form-control'}),
             'body': forms.Textarea(attrs={'class': 'form-control'}),
         }
+
+class ReviewForm(forms.ModelForm):
+    class Meta:
+        model = ReviewRating
+        fields = ['customer_service', 'review', 'build_quality', 'amenities', 'location', 'would_reviewer_recommend']

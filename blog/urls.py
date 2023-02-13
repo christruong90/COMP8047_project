@@ -1,6 +1,7 @@
 from django.urls import path
 # from . import views
 from .views import HomeView, CondoDetailView, AddCondoView, UpdateCondoView, DeleteCondoView
+from django.conf import settings
 
 urlpatterns = [
     # path('', views.home, name="home"),
