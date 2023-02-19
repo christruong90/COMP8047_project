@@ -38,8 +38,8 @@ class ReviewRating(models.Model):
     location = models.FloatField()
     review_title = models.CharField(max_length=100, blank=True)
     review = models.TextField(max_length=500, blank=True)
-    would_reviewer_recommend = models.BooleanField()
+    # would_reviewer_recommend = models.BooleanField()
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.subject
+        return self.review_title

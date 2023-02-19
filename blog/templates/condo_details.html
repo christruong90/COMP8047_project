@@ -2,6 +2,16 @@
 {% block title %} {{condo.title}}{% endblock %}
 {% block content %}
 
+<script>
+    var m = document.getElementsByClassName("alert");  // Return an array
+
+    setTimeout(function(){
+    if (m && m.length) {
+        m[0].classList.add('hide');
+    }
+    }, 1000);
+</script>
+
 <h1>{{ condo.title }}</h1>
 <br>
 <small>
@@ -14,7 +24,7 @@
 {% endif %}
 {{condo.body}}
 
-<form action="" method="POST">
+<form action="{% url 'submit_review' condo.pk %}" method="POST">
     <br><br>
     {% csrf_token %}
     <h5>Write Your Review</h5>
@@ -29,6 +39,33 @@
             <input type="radio" name="customer_service" id="rating2" value="2" required /><label for="rating2" title="2"></label>
             <input type="radio" name="customer_service" id="rating1" value="1" required /><label for="rating1" title="1"></label>
         </div>
+        <label>Rate Build Quality</label>
+        <br>
+        <div class="rate">
+            <input type="radio" name="build_quality" id="rating5" value="5" required /><label for="rating5" title="5"></label>
+            <input type="radio" name="build_quality" id="rating4" value="4" required /><label for="rating4" title="4"></label>
+            <input type="radio" name="build_quality" id="rating3" value="3" required /><label for="rating3" title="3"></label>
+            <input type="radio" name="build_quality" id="rating2" value="2" required /><label for="rating2" title="2"></label>
+            <input type="radio" name="build_quality" id="rating1" value="1" required /><label for="rating1" title="1"></label>
+        </div>
+        <label>Rate Build Amenities</label>
+        <br>
+        <div class="rate">
+            <input type="radio" name="amenities" id="rating5" value="5" required /><label for="rating5" title="5"></label>
+            <input type="radio" name="amenities" id="rating4" value="4" required /><label for="rating4" title="4"></label>
+            <input type="radio" name="amenities" id="rating3" value="3" required /><label for="rating3" title="3"></label>
+            <input type="radio" name="amenities" id="rating2" value="2" required /><label for="rating2" title="2"></label>
+            <input type="radio" name="amenities" id="rating1" value="1" required /><label for="rating1" title="1"></label>
+        </div>
+        <label>Rate Location</label>
+        <br>
+        <div class="rate">
+            <input type="radio" name="location" id="rating5" value="5" required /><label for="rating5" title="5"></label>
+            <input type="radio" name="location" id="rating4" value="4" required /><label for="rating4" title="4"></label>
+            <input type="radio" name="location" id="rating3" value="3" required /><label for="rating3" title="3"></label>
+            <input type="radio" name="location" id="rating2" value="2" required /><label for="rating2" title="2"></label>
+            <input type="radio" name="location" id="rating1" value="1" required /><label for="rating1" title="1"></label>
+        </div>
         <br>
         Review Title:
         <input name="review_title" type="text" class="form-control">
@@ -39,7 +76,24 @@
         <input type="submit" value="Submit Review" class="btn btn-primary">
         <br>
     </div>
+    {% include 'includes/alerts.html' %}
 </form>
+<br>
+<header class="section-heading">
+    <h3>Customer Reviews</h3>
+    <ul>
+    {% for review in object_list2 %}
+        {{ review.review_title }}<br>
+        {{ review.review }}<br>
+        {{ review.customer_service }}<br>
+        {{ review.build_quality }}<br>
+        {{ review.amenities }}<br>
+        {{ review.locations }}
+        <hr>
+    {% endfor%}
+    </ul>
+    
+</header>
 
 {% endblock %}
 
