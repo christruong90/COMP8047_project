@@ -92,7 +92,7 @@
 <header class="section-heading">
     <h3>Customer Reviews</h3>
     <ul>
-    {% for review in object_list2 %}
+    {% for review in condo.reviews.all %}
         {{ review.review_title }}<br>
         {{ review.review }}<br>
         {{ review.customer_service }}<br>

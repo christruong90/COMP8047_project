@@ -30,7 +30,7 @@ class Condo(models.Model):
 
 
 class ReviewRating(models.Model):
-    condo = models.ForeignKey(Condo, on_delete=models.CASCADE)
+    condo = models.ForeignKey(Condo, on_delete=models.CASCADE, related_name='reviews')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     customer_service = models.FloatField()
     build_quality = models.FloatField()

@@ -20,10 +20,8 @@ class CondoDetailView(DetailView):
     model = Condo
     template_name = 'condo_details.html'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['object_list2'] = ReviewRating.objects.all()
-        return context
+    def get_queryset(self):
+        return Condo.objects.prefetch_related('reviews')
 
 class AddCondoView(CreateView):
     model = Condo
