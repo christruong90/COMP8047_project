@@ -5,6 +5,7 @@ from .models import Condo, ReviewRating
 from .forms import CondoForm, EditForm, ReviewForm
 from django.urls import reverse_lazy
 from django.contrib import messages
+from .filters import CondoFilter
 
 # Create your views here.
 
@@ -15,6 +16,12 @@ class HomeView(ListView):
     model = Condo 
     template_name = 'home.html'
     order = ['-id']
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        myFilter = CondoFilter(self.request.GET, queryset=self.get_queryset())
+        context['myFilter'] = myFilter
+        return context
 
 class CondoDetailView(DetailView):
     model = Condo
@@ -58,7 +65,7 @@ def submit_review(request, condo_id):
             data.customer_service = form.cleaned_data['customer_service']
             data.build_quality = form.cleaned_data['build_quality']
             data.amenities = form.cleaned_data['amenities']
-            # data.would_reviewer_recommend = form.cleaned_data['would_reviewer_recommend']
+            data.would_reviewer_recommend = form.cleaned_data['would_reviewer_recommend']
             data.location = form.cleaned_data['location']
             data.condo_id = condo_id
             data.user_id = request.user.id

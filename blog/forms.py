@@ -26,5 +26,5 @@ class EditForm(forms.ModelForm):
 class ReviewForm(forms.ModelForm):
     class Meta:
         model = ReviewRating
-        fields = ['review_title', 'review', 'customer_service', 'build_quality', 'amenities', 'location']
+        fields = ['review_title', 'review', 'customer_service', 'build_quality', 'amenities', 'location', 'would_reviewer_recommend']
         # fields = ('__all__')

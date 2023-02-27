@@ -14,15 +14,23 @@
 
 <h1>{{ condo.title }}</h1>
 <br>
-<small>
-    <a href="{% url 'update_condo' condo.pk %}">Edit</a>
-    <a href="{% url 'delete_condo' condo.pk %}">Delete</a>
-</small>
 <br>
 {% if condo.condo_image %}
     <img src="{{ condo.condo_image.url}}"><br><br>
 {% endif %}
-{{condo.body}}
+<br>
+Pet Friendly:{% if condo.pet_friendly %} Yes {%else %} No {% endif %}
+<br>
+Built In: {{condo.built_in}}
+<br>
+Number of units: {{condo.number_of_units}} | {{condo.floors}} stories
+<br>
+Developer: {{condo.developer}} | Artchitect: {{condo.architect}}
+<br>
+<small>
+    <a href="{% url 'update_condo' condo.pk %}">Edit</a>
+    <a href="{% url 'delete_condo' condo.pk %}">Delete</a>
+</small>
 
 <form action="{% url 'submit_review' condo.pk %}" method="POST">
     <br><br>
@@ -85,6 +93,16 @@
         <br>
         <input type="submit" value="Submit Review" class="btn btn-primary">
         <br>
+        Would Reviewer Recommend?
+        <br>
+        <!-- <select name="would_reviewer_recommend">
+            <option value="1" {% if condo.would_reviewer_recommend %}selected {% endif %}>Yes</option>
+            <option value="0">No</option>
+        </select> -->
+        <label>
+            <input type="checkbox" name="would_reviewer_recommend" value="yes" {% if condo.would_reviewer_recommend%}checked{% endif %}>
+            Yes
+        </label>
     </div>
     {% include 'includes/alerts.html' %}
 </form>

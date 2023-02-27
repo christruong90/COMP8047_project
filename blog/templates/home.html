@@ -3,6 +3,7 @@
 
 <h1> Condos</h1>
 
+
 <ul>
 {% for condo in object_list %}
     <li>
@@ -20,5 +21,24 @@
     <hr>
 {% endfor%}
 </ul>
+<br>
+<div class="row">
+    <div class="col">
+        <div class="card card-body">
+            <form method="get">
+                {{myFilter.form}}
+                <button class="btn btn-primary" type="submit">Search</button>
+            </form>
+        </div>
+    </div>
+</div>
+<br>
+<ul>
+    {% for condo in myFilter.qs%}
+        <li>{{condo.pet_friendly}}</li>
+    {% endfor %}
+</ul>
 
 {% endblock %}
+
+
