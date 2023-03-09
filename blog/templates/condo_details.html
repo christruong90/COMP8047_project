@@ -32,6 +32,11 @@ Developer: {{condo.developer}} | Artchitect: {{condo.architect}}
     <a href="{% url 'delete_condo' condo.pk %}">Delete</a>
 </small>
 
+<p> Averge of customer service rating: {{ratings.avg_customer_service}} </p>
+<p> Averge of build quality rating: {{ratings.avg_build_quality}} </p>
+<p> Averge of amenities rating: {{ratings.avg_amenities}} </p>
+<p> Averge of location rating: {{ratings.avg_location}} </p>
+
 <form action="{% url 'submit_review' condo.pk %}" method="POST">
     <br><br>
     {% csrf_token %}
