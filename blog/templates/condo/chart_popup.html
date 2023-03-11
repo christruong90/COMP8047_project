@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chart Popup</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+</head>
+<body>
+  <canvas id="myChart"></canvas>
+
+  <script>
+    window.addEventListener("message", function(event) {
+        // Check the origin of the message
+        if (event.origin !== window.location.origin) return
+
+        // Extract the label and data from the event data
+        var label = event.data.label
+        var data = event.data.data
+
+        var ctx = document.getElementById('myChart').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: label,
+                datasets: [{
+                    label: "Average Ratings",
+                    data: data,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                },
+                animation: {
+                    // Delay the animation of each bar by a certain amount
+                    // depending on its index in the dataset
+                    duration: 4000,
+                    delay: function(animation) {
+                        return animation.index * 200;
+                    }
+                }
+            }
+        });
+    });
+  </script>
+</body>
+</html>

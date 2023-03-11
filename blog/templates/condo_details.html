@@ -10,6 +10,26 @@
         m[0].classList.add('hide');
     }
     }, 1000);
+
+    function openChartWindow() {
+        // Get ratings data from context
+        const ratingsData = "{{ ratings_data|escapejs }}";
+        
+        // Parse ratings data as JSON
+        const ratings = JSON.parse(ratingsData);
+        // Define the URL of the chart popup window
+        const url = "{% url 'chart_popup' %}";
+
+        // Open the pop-up window
+        const chartWindow = window.open(url, '_blank', 'width=600,height=400');
+
+        // When the pop-up window is loaded, pass the chart data to it
+        chartWindow.addEventListener('load', function() {
+            var label = ratings.labels
+            var data = ratings.values
+            chartWindow.postMessage({label: label, data: data}, "*");
+        });
+    }
 </script>
 
 <h1>{{ condo.title }}</h1>
@@ -36,6 +56,8 @@ Developer: {{condo.developer}} | Artchitect: {{condo.architect}}
 <p> Averge of build quality rating: {{ratings.avg_build_quality}} </p>
 <p> Averge of amenities rating: {{ratings.avg_amenities}} </p>
 <p> Averge of location rating: {{ratings.avg_location}} </p>
+<button id="chart-btn" onclick="openChartWindow()">Show Ratings Chart</button>
+
 
 <form action="{% url 'submit_review' condo.pk %}" method="POST">
     <br><br>

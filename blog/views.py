@@ -1,12 +1,13 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.db.models import Avg
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
 from .models import Condo, ReviewRating
 from .forms import CondoForm, EditForm, ReviewForm
 from django.urls import reverse_lazy
 from django.contrib import messages
 from .filters import CondoFilter
+import json
 
 # Create your views here.
 
@@ -36,6 +37,13 @@ class CondoDetailView(DetailView):
         condo = self.get_object()
         ratings = ReviewRating.objects.filter(condo=condo).aggregate(avg_customer_service=Avg('customer_service'), avg_build_quality=Avg('build_quality'),avg_amenities=Avg('amenities'), avg_location=Avg('location'))
         context['ratings'] = ratings
+        ratings_data = {
+            'labels': ['Customer Service', 'Build Quality', 'Amenities', 'Location'],
+            'values': [ratings['avg_customer_service'], ratings['avg_build_quality'], ratings['avg_amenities'], ratings['avg_location']]
+        }
+
+        ratings_data_json = json.dumps(ratings_data)
+        context['ratings_data'] = ratings_data_json
         return context  
 
 class AddCondoView(CreateView):
@@ -80,5 +88,8 @@ def submit_review(request, condo_id):
             data.save()
             messages.success(request, 'Thank you! Your review has been Submitted.')
             return redirect(url)
+          
+def chart_popup(request):
+    return render(request, 'condo/chart_popup.html')
     
 
