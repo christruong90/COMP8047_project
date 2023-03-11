@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect
+from django.db.models import Avg
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from .models import Condo, ReviewRating
 from .forms import CondoForm, EditForm, ReviewForm
@@ -29,6 +30,13 @@ class CondoDetailView(DetailView):
 
     def get_queryset(self):
         return Condo.objects.prefetch_related('reviews')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        condo = self.get_object()
+        ratings = ReviewRating.objects.filter(condo=condo).aggregate(avg_customer_service=Avg('customer_service'), avg_build_quality=Avg('build_quality'),avg_amenities=Avg('amenities'), avg_location=Avg('location'))
+        context['ratings'] = ratings
+        return context  
 
 class AddCondoView(CreateView):
     model = Condo
