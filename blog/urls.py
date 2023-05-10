@@ -1,6 +1,6 @@
 from django.urls import path, include
 # from . import views
-from .views import HomeView, CondoDetailView, AddCondoView, UpdateCondoView, DeleteCondoView, submit_review, chart_popup
+from .views import HomeView, CondoDetailView, AddCondoView, UpdateCondoView, DeleteCondoView, submit_review, chart_popup, chart_8071
 from django.conf import settings
 
 urlpatterns = [
@@ -12,4 +12,5 @@ urlpatterns = [
     path('condo/<int:pk>/remove', DeleteCondoView.as_view(), name='delete_condo'),
     path('submit_review/<int:condo_id>/', submit_review, name="submit_review"),
     path('chart_popup/', chart_popup, name='chart_popup'),
+    path('chart_8071/', chart_8071, name='chart_8071'),
 ]

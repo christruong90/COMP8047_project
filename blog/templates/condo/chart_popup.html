@@ -15,6 +15,8 @@
         // Extract the label and data from the event data
         var label = event.data.label
         var data = event.data.data
+        label = ["Seattle", "Bellevue", "Redmond", "Vancouver", "Kirkland"]
+        data = [21259, 6233, 4484, 4264, 3780]
 
         var ctx = document.getElementById('myChart').getContext('2d');
         var myChart = new Chart(ctx, {
@@ -22,7 +24,7 @@
             data: {
                 labels: label,
                 datasets: [{
-                    label: "Average Ratings",
+                    label: "Top 5 Cities with Electric Vehicles",
                     data: data,
                     backgroundColor: [
                         'rgba(255, 99, 132, 0.2)',

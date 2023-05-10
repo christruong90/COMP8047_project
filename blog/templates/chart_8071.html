@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+
+    <title>My Template</title>
+</head>
+<body>
+    <!-- {% block content %}
+    <div id="chart-container">
+        <canvas id="my-chart"></canvas>
+    </div>
+
+    <script>
+        var chartData = {{ data|safe }};
+    </script>
+    {% endblock %} -->
+    <h1>{{ message }}</h1>
+    <canvas id="myChart"></canvas>
+
+    <script>
+        var data = {{ data|safe }};
+        var ctx = document.getElementById('myChart').getContext('2d');
+        var chart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: data.map(function(row) { return row.date; }),
+            datasets: [{
+              label: 'Data',
+              data: data.map(function(row) { return row.value; }),
+              backgroundColor: 'rgba(0, 119, 204, 0.3)',
+              borderColor: 'rgba(0, 119, 204, 1)',
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              yAxes: [{
+                ticks: {
+                  beginAtZero: true
+                }
+              }]
+            }
+          }
+        });
+      </script>
+    <!-- {%for row in data%}
+    <tr>
+        <td> {{row.columns1}}</td>
+        <td> {{row.columns2}}</td>
+        <td> {{row.columns3}}</td>
+    </tr>
+        
+    {% endfor %} -->
+    
+</body>
+
+</html>
