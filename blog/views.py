@@ -7,6 +7,8 @@ from .forms import CondoForm, EditForm, ReviewForm
 from django.urls import reverse_lazy
 from django.contrib import messages
 from .filters import CondoFilter
+from django.core.paginator import Paginator
+from django.views.generic.list import MultipleObjectMixin
 import json, numpy
 import pandas as pd
 
@@ -36,6 +38,15 @@ class CondoDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         condo = self.get_object()
+
+        ## Paginate condo reviews
+        condo_reviews = ReviewRating.objects.filter(condo=condo)
+        paginator = Paginator(condo_reviews, 5)
+        page_number = self.request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+        context['condo_reviews'] = page_obj
+        
+
         ratings = ReviewRating.objects.filter(condo=condo).aggregate(avg_customer_service=Avg('customer_service'), avg_build_quality=Avg('build_quality'),avg_amenities=Avg('amenities'), avg_location=Avg('location'))
         context['ratings'] = ratings
 

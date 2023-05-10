@@ -157,7 +157,7 @@ Developer: {{condo.developer}} | Artchitect: {{condo.architect}}
 <header class="section-heading">
     <h3>Customer Reviews</h3>
     <ul>
-    {% for review in condo.reviews.all %}
+    {% for review in condo_reviews %}
         {{ review.review_title }}<br>
         {{ review.review }}<br>
         {{ review.customer_service }}<br>
@@ -165,7 +165,21 @@ Developer: {{condo.developer}} | Artchitect: {{condo.architect}}
         {{ review.amenities }}<br>
         {{ review.location }}
         <hr>
-    {% endfor%}
+    {% endfor %}
+    {% if condo_reviews.has_previous %}
+        <a href="?page={{ condo_reviews.previous_page_number }}">previous</a>
+    {% endif %}
+    {% for page_number in condo_reviews.paginator.page_range %}
+    {% if condo_reviews.number == page_number %}
+        <span>{{ page_number }}</span>
+    {% else %}
+        <a href="?page={{ page_number }}">{{ page_number }}</a>
+    {% endif %}
+    {% endfor %}
+
+    {% if condo_reviews.has_next %}
+        <a href="?page={{ condo_reviews.next_page_number }}">next</a>
+    {% endif %}
     </ul>
     
 </header>
