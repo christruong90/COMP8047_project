@@ -13,4 +13,5 @@ urlpatterns = [
     path('submit_review/<int:condo_id>/', submit_review, name="submit_review"),
     path('chart_popup/', chart_popup, name='chart_popup'),
     path('chart_8071/', chart_8071, name='chart_8071'),
+    # path('mortgage_rates/', mortgage_scrape, name='mortgage_rates'),
 ]

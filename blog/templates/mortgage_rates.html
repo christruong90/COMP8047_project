@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Scraped Data</h1>
+<ul>
+  {% for mortgage in large_brokerage_list %}
+    <li>{{ mortgage }}</li>
+  {% endfor %}
+</ul>
+{% if creditunion_list %}
+    <p>The context variable is working!</p>
+{% else %}
+    <p>The context variable is not working!</p>
+{% endif %}
+{% endblock %}

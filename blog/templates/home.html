@@ -35,9 +35,33 @@
 <br>
 <ul>
     {% for condo in myFilter.qs%}
+        <li>{{condo.title}}</li>
         <li>{{condo.pet_friendly}}</li>
     {% endfor %}
 </ul>
+
+<hr>
+<h2>Large Mortgage Brokers:</h2>
+<ul>
+  {% for mortgage in large_brokerage_list %}
+    <li>{{ mortgage }}</li>
+  {% endfor %}
+</ul>
+
+<h2>Online Mortgage Brokers: </h2>
+<ul>
+    {% for mortgage in online_brokerage_list %}
+        <li>{{ mortgage }}</li>
+    {% endfor %}
+</ul>
+
+<h2>Credit Unions: </h2>
+<ul>
+    {% for creditunion in creditunion_list %}
+        <li>{{ creditunion }}</li>
+    {% endfor %}
+</ul>
+
 
 {% endblock %}
 

@@ -11,6 +11,8 @@ from django.core.paginator import Paginator
 from django.views.generic.list import MultipleObjectMixin
 import json, numpy
 import pandas as pd
+import requests
+from bs4 import BeautifulSoup
 
 # Create your views here.
 
@@ -24,10 +26,40 @@ class HomeView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        
+        ## Search Functionality
         myFilter = CondoFilter(self.request.GET, queryset=self.get_queryset())
         context['myFilter'] = myFilter
-        return context
 
+        # Webscraping Functionality
+        url = "https://rates.ca/mortgage-rates/british-columbia#brokersandcreditunions"
+        response = requests.get(url)
+        content = response.content
+        soup = BeautifulSoup(content, 'html.parser')
+        data = soup.find_all('div', {'class':"richtext-container"})
+
+        mortage_brokers_list = data[2].find_all("ul")
+
+        large_brokerage_list = []
+        for li in mortage_brokers_list[0]:
+            large_brokerage_list.append(li.text)
+        
+        context['large_brokerage_list'] = large_brokerage_list
+        
+        online_brokerage_list = []
+        for li in mortage_brokers_list[1]:
+            online_brokerage_list.append(li.text)
+        
+        context['online_brokerage_list'] = online_brokerage_list
+
+        creditunion_list = []
+        for li in data[3].find_all("ul")[0]:
+            creditunion_list.append(li.text)
+        
+        context['creditunion_list'] = creditunion_list
+
+        return context
+    
 class CondoDetailView(DetailView):
     model = Condo
     template_name = 'condo_details.html'
@@ -68,83 +100,109 @@ class CondoDetailView(DetailView):
 
 
         # get most recent review reviews:
-        latest_review_object = ReviewRating.objects.filter(condo=condo).order_by('-id').first()
-        context['latest_review_object'] = latest_review_object
+        latest_review_object = ReviewRating.objects.filter(condo=condo).order_by('-id')
+        if latest_review_object.exists():
+            no_probability_list = []
+            yes_probability_list = []
+            latest_review_object = latest_review_object.first() 
+            context['latest_review_object'] = latest_review_object
+            last_customer_service_rating = latest_review_object.customer_service
+            last_amenities_rating = latest_review_object.amenities
+            last_location_rating = latest_review_object.location
+            last_build_quality_rating = latest_review_object.build_quality
 
-        last_customer_service_rating = latest_review_object.customer_service
-        last_amenities_rating = latest_review_object.amenities
-        last_location_rating = latest_review_object.location
-        last_build_quality_rating = latest_review_object.build_quality
 
+            ## get customer service probability
+            # query formula comes from filtering for the last customer rating, whether reviewers recommend or not and getting a count of number of stars (rows) based on the last customer rating.
+            yes_customer_service_probability = ReviewRating.objects.filter(condo=condo).filter(customer_service=last_customer_service_rating).filter(would_reviewer_recommend=1).aggregate(star_count=Count("id"))
+            # if condition if number of yes is not 0
+            if number_of_yes !=0:
+                yes_customer_service_probability = (yes_customer_service_probability['star_count']) / number_of_yes
+                context['yes_customer_service_probability'] = yes_customer_service_probability
+                yes_probability_list.append(yes_customer_service_probability)
+            
 
-        ## get customer service probability
-        # query formula comes from filtering for the last customer rating, whether reviewers recommend or not and getting a count of number of stars (rows) based on the last customer rating.
-        yes_customer_service_probability = ReviewRating.objects.filter(condo=condo).filter(customer_service=last_customer_service_rating).filter(would_reviewer_recommend=1).aggregate(star_count=Count("id"))
-        yes_customer_service_probability = (yes_customer_service_probability['star_count']) / number_of_yes
-        
-        
-        context['yes_customer_service_probability'] = yes_customer_service_probability
-        
+            no_customer_service_probability = ReviewRating.objects.filter(condo=condo).filter(customer_service=last_customer_service_rating).filter(would_reviewer_recommend=0).aggregate(star_count=Count("id"))
+            # if condition if number of no is not 0
+            if number_of_no !=0:
+                no_customer_service_probability = (no_customer_service_probability['star_count'])/ number_of_no
+                context['no_customer_service_probability'] = no_customer_service_probability
+                no_probability_list.append(no_customer_service_probability)
 
-        no_customer_service_probability = ReviewRating.objects.filter(condo=condo).filter(customer_service=last_customer_service_rating).filter(would_reviewer_recommend=0).aggregate(star_count=Count("id"))
-        no_customer_service_probability = (no_customer_service_probability['star_count'])/ number_of_no
+            ## get amenities probability
+            yes_amenities_probability = ReviewRating.objects.filter(condo=condo).filter(amenities=last_amenities_rating).filter(would_reviewer_recommend=1).aggregate(star_count=Count("id"))
+            if number_of_yes !=0:
+                yes_amenities_probability = (yes_amenities_probability['star_count']) / number_of_yes
+                context['yes_amenities_probability'] = yes_amenities_probability
+                yes_probability_list.append(yes_amenities_probability)
 
-        context['no_customer_service_probability'] = no_customer_service_probability
+            no_amenities_probability = ReviewRating.objects.filter(condo=condo).filter(amenities=last_amenities_rating).filter(would_reviewer_recommend=0).aggregate(star_count=Count("id"))
+            # if condition if number of no is not 0
+            if number_of_no != 0:
+                no_amenities_probability = (no_amenities_probability['star_count']) / number_of_no
+                context['no_amenities_probability'] = no_amenities_probability
+                no_probability_list.append(no_amenities_probability)
 
-        ## get amenities probability
-        yes_amenities_probability = ReviewRating.objects.filter(condo=condo).filter(amenities=last_amenities_rating).filter(would_reviewer_recommend=1).aggregate(star_count=Count("id"))
-        yes_amenities_probability = (yes_amenities_probability['star_count']) / number_of_yes
-        
-        context['yes_amenities_probability'] = yes_amenities_probability
+            ## get location probability
+            yes_location_probability = ReviewRating.objects.filter(condo=condo).filter(location=last_location_rating).filter(would_reviewer_recommend=1).aggregate(star_count=Count("id"))
+            if number_of_yes !=0:
+                yes_location_probability = (yes_location_probability['star_count']) / number_of_yes
+                context['yes_location_probability'] = yes_location_probability
+                yes_probability_list.append(yes_location_probability)
 
-        no_amenities_probability = ReviewRating.objects.filter(condo=condo).filter(amenities=last_amenities_rating).filter(would_reviewer_recommend=0).aggregate(star_count=Count("id"))
-        no_amenities_probability = (no_amenities_probability['star_count']) / number_of_no
+            no_location_probability = ReviewRating.objects.filter(condo=condo).filter(location=last_location_rating).filter(would_reviewer_recommend=0).aggregate(star_count=Count("id"))
+            # if condition if number of no is not 0
+            if number_of_no != 0:
+                no_location_probability = (no_location_probability['star_count']) / number_of_no
+                
+                context['no_location_probability'] = no_location_probability
+                no_probability_list.append(no_location_probability)
 
-        context['no_amenities_probability'] = no_amenities_probability
+            ## get build quality probabilty 
+            yes_build_quality_probability = ReviewRating.objects.filter(condo=condo).filter(build_quality=last_build_quality_rating).filter(would_reviewer_recommend=1).aggregate(star_count=Count("id"))
+            
+            if number_of_yes !=0:
+                context['test2'] = yes_build_quality_probability['star_count']
+                yes_build_quality_probability = (yes_build_quality_probability['star_count']) / number_of_yes
+                context['yes_build_quality_probability'] = yes_build_quality_probability
+                yes_probability_list.append(yes_build_quality_probability)
 
-        ## get location probability
-        yes_location_probability = ReviewRating.objects.filter(condo=condo).filter(location=last_location_rating).filter(would_reviewer_recommend=1).aggregate(star_count=Count("id"))
-        yes_location_probability = (yes_location_probability['star_count']) / number_of_yes
-        
-        context['yes_location_probability'] = yes_location_probability
+            no_build_quality_probability = ReviewRating.objects.filter(condo=condo).filter(build_quality=last_build_quality_rating).filter(would_reviewer_recommend=0).aggregate(star_count=Count("id"))
+            # if condition if number of no is not 0
+            if number_of_no != 0:
+                no_build_quality_probability = (no_build_quality_probability['star_count']) / number_of_no
 
-        no_location_probability = ReviewRating.objects.filter(condo=condo).filter(location=last_location_rating).filter(would_reviewer_recommend=0).aggregate(star_count=Count("id"))
-        no_location_probability = (no_location_probability['star_count']) / number_of_no
-        
-        context['no_location_probability'] = no_location_probability
+                context['no_build_quality_probability'] = no_build_quality_probability
+                no_probability_list.append(no_build_quality_probability)
 
-        ## get build quality probabilty 
-        yes_build_quality_probability = ReviewRating.objects.filter(condo=condo).filter(location=last_build_quality_rating).filter(would_reviewer_recommend=1).aggregate(star_count=Count("id"))
-        yes_build_quality_probability = (yes_build_quality_probability['star_count']) / number_of_yes
+            yes_probability = number_of_yes/total_rows
+            context['yes_probability'] = yes_probability
+            yes_probability_list.append(yes_probability)
 
-        context['yes_build_quality_probability'] = yes_build_quality_probability
+            no_probability = number_of_no/total_rows
+            context['no_probability'] = no_probability
+            no_probability_list.append(no_probability)
 
-        no_build_quality_probability = ReviewRating.objects.filter(condo=condo).filter(location=last_build_quality_rating).filter(would_reviewer_recommend=0).aggregate(star_count=Count("id"))
-        no_build_quality_probability = (no_build_quality_probability['star_count']) / number_of_no
+            # yes_probability_list = [yes_customer_service_probability, yes_amenities_probability, yes_location_probability, yes_build_quality_probability, yes_probability]
+            yes_probability_list = [i for i in yes_probability_list if i != 0]
+            if len(yes_probability_list):
+                yes_probability_list_product = numpy.prod(yes_probability_list)
+            else:
+                yes_probability_list_product = 0
+            
+            # no_probability_list = [no_customer_service_probability, no_amenities_probability, no_location_probability, no_build_quality_probability, no_probability]
+            no_probability_list = [i for i in no_probability_list if i != 0]
+            if len(no_probability_list) > 0:
+                no_probability_list_product = numpy.prod(no_probability_list)
+            else:
+                no_probability_list_product = 0
 
-        context['no_build_quality_probability'] = no_build_quality_probability
+            if yes_probability_list_product > no_probability_list_product:
+                value_rating = 0 + (100 * yes_probability_list_product)
+            else:
+                value_rating = 0 - (100 * no_probability_list_product)
 
-        yes_probability = number_of_yes/total_rows
-        context['yes_probability'] = yes_probability
-
-        no_probability = number_of_no/total_rows
-        context['no_probability'] = no_probability
-
-        yes_probability_list = [yes_customer_service_probability, yes_amenities_probability, yes_location_probability, yes_build_quality_probability, yes_probability]
-        yes_probability_list = [i for i in yes_probability_list if i != 0]
-        yes_probability_list_product = numpy.prod(yes_probability_list)
-        
-
-        no_probability_list = [no_customer_service_probability, no_amenities_probability, no_location_probability, no_build_quality_probability, no_probability]
-        no_probability_list = [i for i in no_probability_list if i != 0]
-        no_probability_list_product = numpy.prod(no_probability_list)
-
-        if yes_probability_list_product > no_probability_list_product:
-            value_rating = 0 + (100 * yes_probability_list_product)
-        else:
-            value_rating = 0 - (100 * no_probability_list_product)
-
-        context['value_rating'] = value_rating
+            context['value_rating'] = value_rating
 
         return context  
 
@@ -201,4 +259,5 @@ def chart_8071(request):
 
     context = {'message': 'Hello, change!', 'csv_data': json_data}
     return render(request, 'chart_8071.html', context)
+
 
