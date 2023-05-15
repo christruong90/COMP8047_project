@@ -1,0 +1,13 @@
+{% extends 'base.html'%}
+{% block content %}
+
+<h1>Developers</h1>
+{% for developer in object_list %}
+    <a href="{% url 'developer-detail' developer.pk %}">{{developer.title}}</a>
+    {% for condo in developer.condo_set.all %}
+        <li> <a href="{% url 'condo-info' condo.pk %}">{{condo.title}} </a></li>
+    {% endfor %}
+<hr>
+{% endfor %}
+
+{% endblock %}

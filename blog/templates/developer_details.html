@@ -1,89 +1,13 @@
 {% extends 'base.html'%}
-{% block title %} {{condo.title}}{% endblock %}
 {% block content %}
 
-<script>
-    var m = document.getElementsByClassName("alert");  // Return an array
+<h1>Developer Details </h1>
 
-    setTimeout(function(){
-    if (m && m.length) {
-        m[0].classList.add('hide');
-    }
-    }, 1000);
+<h1>{{developer.title}}</h1>
 
-    function openChartWindow() {
-        // Get ratings data from context
-        const ratingsData = "{{ ratings_data|escapejs }}";
-        
-        // Parse ratings data as JSON
-        const ratings = JSON.parse(ratingsData);
-        // Define the URL of the chart popup window
-        const url = "{% url 'chart_popup' %}";
+<hr>
 
-        // Open the pop-up window
-        const chartWindow = window.open(url, '_blank', 'width=600,height=400');
-
-        // When the pop-up window is loaded, pass the chart data to it
-        chartWindow.addEventListener('load', function() {
-            var label = ratings.labels
-            var data = ratings.values
-            chartWindow.postMessage({label: label, data: data}, "*");
-        });
-    }
-</script>
-
-<h1>{{ condo.title }}</h1>
-<br>
-<br>
-{% if condo.condo_image %}
-    <img src="{{ condo.condo_image.url}}"><br><br>
-{% endif %}
-<br>
-Pet Friendly:{% if condo.pet_friendly %} Yes {%else %} No {% endif %}
-<br>
-Built In: {{condo.built_in}}
-<br>
-Number of units: {{condo.number_of_units}} | {{condo.floors}} stories
-<br>
-Developer: <a href="{% url 'developer-detail' condo.developer.pk %}">{{condo.developer}}</a> | Artchitect: {{condo.architect}}
-<br>
-<small>
-    <a href="{% url 'update_condo' condo.pk %}">Edit</a>
-    <a href="{% url 'delete_condo' condo.pk %}">Delete</a>
-</small>
-
-<p> Averge of customer service rating: {{ratings.avg_customer_service}} </p>
-<p> Averge of build quality rating: {{ratings.avg_build_quality}} </p>
-<p> Averge of amenities rating: {{ratings.avg_amenities}} </p>
-<p> Averge of location rating: {{ratings.avg_location}} </p>
-<button id="chart-btn" onclick="openChartWindow()">Show Ratings Chart</button>
-<p> total number of rows: {{total_rows}} </p>
-<p> number of yes's: {{number_of_yes}} </p>
-<p> number of no's: {{number_of_no}} </p> 
-<br>
-<p>most recent review. Customer service: {{latest_review_object.customer_service}}</p>
-<p>most recent review. amenities: {{latest_review_object.amenities}}</p>
-<p>most recent review. build quality: {{latest_review_object.build_quality}}</p>
-<p>most recent review. location: {{latest_review_object.location}}</p>
-
-<p>test2: {{test2}}</p>
-
-<p> YES customer service 1-star probability: {{yes_customer_service_probability}} </p>
-<p>NO customer service probability: {{no_customer_service_probability}}</p>
-<p> YES amenities 1-star probability: {{yes_amenities_probability}} </p> 
-<p> NO amenities 1-star probability: {{no_amenities_probability}} </p> 
-<p> YES locations probability: {{yes_location_probability}} </p> 
-<p> NO locations probability: {{no_location_probability}} </p> 
-<p> YES build quality 1-star probability: {{yes_build_quality_probability}} </p> 
-<p> NO build quality 1-star probability: {{no_build_quality_probability}} </p> 
-<p>yes cus service probability: {{test1}}</p>
-<p>total YEs probability: {{yes_probability}}</p>
-<p>total NO probability: {{no_probability}}</p>
-<p>value rating: {{value_rating}}</p>
-
-
-
-<form action="{% url 'submit_review' condo.pk %}" method="POST">
+<form action="{% url 'submit_developer_review' developer.pk %}" method="POST">
     <br><br>
     {% csrf_token %}
     <h5>Write Your Review</h5>
@@ -123,7 +47,7 @@ Developer: <a href="{% url 'developer-detail' condo.developer.pk %}">{{condo.dev
             </div>
         </div>
         
-        <div class ="test">
+        <!-- <div class ="test">
             <label>Rate Location</label>
             <br>
             <div class="rate">
@@ -133,7 +57,7 @@ Developer: <a href="{% url 'developer-detail' condo.developer.pk %}">{{condo.dev
                 <input type="radio" name="location" id="location-rating2" value="2" required /><label for="location-rating2" title="2"></label>
                 <input type="radio" name="location" id="location-rating1" value="1" required /><label for="location-rating1" title="1"></label>
             </div>
-        </div>
+        </div> -->
         
         <br>
         Review Title:
@@ -150,44 +74,12 @@ Developer: <a href="{% url 'developer-detail' condo.developer.pk %}">{{condo.dev
             <option value="1" {% if condo.would_reviewer_recommend %}selected {% endif %}>Yes</option>
             <option value="0">No</option>
         </select> -->
-        <label>
+        <!-- <label>
             <input type="checkbox" name="would_reviewer_recommend" value="yes" {% if condo.would_reviewer_recommend%}checked{% endif %}>
             Yes
-        </label>
+        </label> -->
     </div>
     {% include 'includes/alerts.html' %}
 </form>
-<br>
-<header class="section-heading">
-    <h3>Customer Reviews</h3>
-    <ul>
-    {% for review in condo_reviews %}
-        {{ review.review_title }}<br>
-        {{ review.review }}<br>
-        {{ review.customer_service }}<br>
-        {{ review.build_quality }}<br>
-        {{ review.amenities }}<br>
-        {{ review.location }}
-        <hr>
-    {% endfor %}
-    {% if condo_reviews.has_previous %}
-        <a href="?page={{ condo_reviews.previous_page_number }}">previous</a>
-    {% endif %}
-    {% for page_number in condo_reviews.paginator.page_range %}
-    {% if condo_reviews.number == page_number %}
-        <span>{{ page_number }}</span>
-    {% else %}
-        <a href="?page={{ page_number }}">{{ page_number }}</a>
-    {% endif %}
-    {% endfor %}
-
-    {% if condo_reviews.has_next %}
-        <a href="?page={{ condo_reviews.next_page_number }}">next</a>
-    {% endif %}
-    </ul>
-    
-</header>
 
 {% endblock %}
-
-

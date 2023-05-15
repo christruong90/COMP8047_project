@@ -1,5 +1,5 @@
 from django import forms
-from .models import Condo, ReviewRating
+from .models import Condo, ReviewRating, DeveloperReview
 
 class CondoForm(forms.ModelForm):
     class Meta:
@@ -28,3 +28,8 @@ class ReviewForm(forms.ModelForm):
         model = ReviewRating
         fields = ['review_title', 'review', 'customer_service', 'build_quality', 'amenities', 'location', 'would_reviewer_recommend']
         # fields = ('__all__')
+
+class DeveloperReviewForm(forms.ModelForm):
+    class Meta:
+        model = DeveloperReview
+        fields = ['review_title', 'review', 'customer_service', 'build_quality', 'amenities']

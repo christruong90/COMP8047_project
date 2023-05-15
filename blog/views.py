@@ -2,8 +2,8 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.db.models import Avg, Count
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
-from .models import Condo, ReviewRating
-from .forms import CondoForm, EditForm, ReviewForm
+from .models import Condo, ReviewRating, Developer, DeveloperReview
+from .forms import CondoForm, EditForm, ReviewForm, DeveloperReviewForm
 from django.urls import reverse_lazy
 from django.contrib import messages
 from .filters import CondoFilter
@@ -16,8 +16,13 @@ from bs4 import BeautifulSoup
 
 # Create your views here.
 
-# def home(request):
-#     return render(request, 'home.html', {})
+class DeveloperView(ListView):
+    model = Developer
+    template_name = 'developers.html'
+
+class DeveloperDetailView(DetailView):
+    model = Developer
+    template_name = 'developer_details.html'
 
 class HomeView(ListView):
     model = Condo 
@@ -260,4 +265,28 @@ def chart_8071(request):
     context = {'message': 'Hello, change!', 'csv_data': json_data}
     return render(request, 'chart_8071.html', context)
 
-
+def submit_developer_review(request, developer_id):
+    url = request.META.get('HTTP_REFERER')
+    if request.method == 'POST':
+        # try:
+        #     reviews = ReviewRating.objects.get(user__id=request.user.id, condo__id=condo_id)
+        #     form = ReviewForm(request.POST, instance=reviews)
+        #     form.save()
+        #     messages.success(request, 'Thank you! Your review has been updated.')
+        #     return redirect(url)
+        # except ReviewRating.DoesNotExist:
+        form = DeveloperReviewForm(request.POST)
+        if form.is_valid():
+            data = DeveloperReview()
+            data.review_title = form.cleaned_data['review_title']
+            data.review = form.cleaned_data['review']
+            data.customer_service = form.cleaned_data['customer_service']
+            data.build_quality = form.cleaned_data['build_quality']
+            data.amenities = form.cleaned_data['amenities']
+            data.developer_id = developer_id
+            data.user_id = request.user.id
+            data.save()
+            messages.success(request, 'Thank you! Your review has been Submitted.')
+            return redirect(url)
+        else:
+            messages.error(request, 'FORM ERROR')
